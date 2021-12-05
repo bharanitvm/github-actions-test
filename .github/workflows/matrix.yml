@@ -4,13 +4,31 @@ on: push
 
 jobs:
   node-version:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest, windows-latest]
+        node_version: [6, 8, 10] # it will the the jobs 3 * 3 = 9 times
+        include:
+          - os: ubuntu-latest # include only for ubuntu-latest & node ver ###4### check evn var 
+            node_version: 8
+            is_ubuntu_8: "true"
+        exclude:
+          - os: ubuntu-latest # ignore ubuntu-latest & node ver 6 
+            node_version: 6
+      #fail-fast: true
+      #max-parallel: 2
+    #runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    env:
+      IS_UNBUNTU_8: ${{ matrix.is_ubuntu_8 }}
     steps:
       - name: log node version
         run: node -v
       - uses: actions/setup-node@v1
         with: 
-          node-version: 6
+          #node-version: 6
+          node-version: ${{ matrix.node_version }}
       - name: log node version
-        run: node -v
-        
+        run: |
+          node -v
+          echo $IS_UNBUNTU_8
